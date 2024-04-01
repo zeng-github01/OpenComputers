@@ -13,17 +13,17 @@ import scala.util.matching.Regex
 object Localization {
   private val nl = Regex.quote("[nl]")
 
-  private def resolveKey(key: String) = if (canLocalize(Settings.namespace + key)) Settings.namespace + key else key
+  private def resolveKey(key: String) = if (canLocalize(Settings.namespace + key)) Option(Settings.namespace + key) else Option.empty
 
   def canLocalize(key: String) = StatCollector.canTranslate(key)
 
-  def localizeLater(formatKey: String, values: AnyRef*) = new ChatComponentTranslation(resolveKey(formatKey), values: _*)
+  def localizeLater(formatKey: String, values: AnyRef*) = new ChatComponentTranslation(resolveKey(formatKey).getOrElse(formatKey), values: _*)
 
-  def localizeLater(key: String) = new ChatComponentTranslation(resolveKey(key))
+  def localizeLater(key: String) = resolveKey(key).map(k => new ChatComponentTranslation(k)).getOrElse(new ChatComponentText(key))
 
-  def localizeImmediately(formatKey: String, values: AnyRef*) = StatCollector.translateToLocalFormatted(resolveKey(formatKey), values: _*).split(nl).map(_.trim).mkString("\n")
+  def localizeImmediately(formatKey: String, values: AnyRef*) = StatCollector.translateToLocalFormatted(resolveKey(formatKey).getOrElse(formatKey), values: _*).split(nl).map(_.trim).mkString("\n")
 
-  def localizeImmediately(key: String) = StatCollector.translateToLocal(resolveKey(key)).split(nl).map(_.trim).mkString("\n")
+  def localizeImmediately(key: String) = resolveKey(key).map(k => StatCollector.translateToLocal(k)).getOrElse(key).split(nl).map(_.trim).mkString("\n")
 
   object Analyzer {
     def Address(value: String) = {
