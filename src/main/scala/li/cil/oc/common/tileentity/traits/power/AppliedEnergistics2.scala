@@ -20,7 +20,7 @@ import net.minecraftforge.fml.common._
 import scala.collection.JavaConversions
 
 trait AppliedEnergistics2 extends Common with IGridHost {
-  private lazy val useAppliedEnergistics2Power = isServer && Mods.AppliedEnergistics2.isModAvailable
+  private def useAppliedEnergistics2Power() = isServer && Mods.AppliedEnergistics2.isModAvailable
 
   // 'Manual' lazy val, because lazy vals mess up the class loader, leading to class not found exceptions.
   private var node: Option[AnyRef] = None
@@ -45,7 +45,7 @@ trait AppliedEnergistics2 extends Common with IGridHost {
 
   override def updateEntity() {
     super.updateEntity()
-    if (useAppliedEnergistics2Power && getWorld.getTotalWorldTime % Settings.get.tickFrequency == 0) {
+    if (useAppliedEnergistics2Power() && getWorld.getTotalWorldTime % Settings.get.tickFrequency == 0) {
       updateEnergy()
     }
   }
@@ -67,24 +67,24 @@ trait AppliedEnergistics2 extends Common with IGridHost {
 
   override def validate() {
     super.validate()
-    if (useAppliedEnergistics2Power) requestGridNodeStateUpdate()
+    if (useAppliedEnergistics2Power()) requestGridNodeStateUpdate()
   }
 
   override def invalidate() {
     super.invalidate()
-    if (useAppliedEnergistics2Power) securityBreak()
+    if (useAppliedEnergistics2Power()) securityBreak()
   }
 
   override def onChunkUnload() {
     super.onChunkUnload()
-    if (useAppliedEnergistics2Power) securityBreak()
+    if (useAppliedEnergistics2Power()) securityBreak()
   }
 
   // ----------------------------------------------------------------------- //
 
   override def readFromNBTForServer(nbt: NBTTagCompound) {
     super.readFromNBTForServer(nbt)
-    if (useAppliedEnergistics2Power) loadNode(nbt)
+    if (useAppliedEnergistics2Power()) loadNode(nbt)
   }
 
   @Optional.Method(modid = Mods.IDs.AppliedEnergistics2)
@@ -103,7 +103,7 @@ trait AppliedEnergistics2 extends Common with IGridHost {
 
   override def writeToNBTForServer(nbt: NBTTagCompound) {
     super.writeToNBTForServer(nbt)
-    if (useAppliedEnergistics2Power) saveNode(nbt)
+    if (useAppliedEnergistics2Power()) saveNode(nbt)
   }
 
   @Optional.Method(modid = Mods.IDs.AppliedEnergistics2)

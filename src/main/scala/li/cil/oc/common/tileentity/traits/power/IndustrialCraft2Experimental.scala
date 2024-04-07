@@ -18,13 +18,13 @@ import net.minecraftforge.fml.common.eventhandler.Event
 trait IndustrialCraft2Experimental extends Common with IndustrialCraft2Common with traits.Tickable {
   private var conversionBuffer = 0.0
 
-  private lazy val useIndustrialCraft2Power = isServer && Mods.IndustrialCraft2.isModAvailable
+  private def useIndustrialCraft2Power() = isServer && Mods.IndustrialCraft2.isModAvailable
 
   // ----------------------------------------------------------------------- //
 
   override def updateEntity() {
     super.updateEntity()
-    if (useIndustrialCraft2Power && getWorld.getTotalWorldTime % Settings.get.tickFrequency == 0) {
+    if (useIndustrialCraft2Power() && getWorld.getTotalWorldTime % Settings.get.tickFrequency == 0) {
       updateEnergy()
     }
   }
@@ -40,17 +40,17 @@ trait IndustrialCraft2Experimental extends Common with IndustrialCraft2Common wi
 
   override def validate() {
     super.validate()
-    if (useIndustrialCraft2Power && !addedToIC2PowerGrid) EventHandler.scheduleIC2Add(this)
+    if (useIndustrialCraft2Power() && !addedToIC2PowerGrid) EventHandler.scheduleIC2Add(this)
   }
 
   override def invalidate() {
     super.invalidate()
-    if (useIndustrialCraft2Power && addedToIC2PowerGrid) removeFromIC2Grid()
+    if (useIndustrialCraft2Power() && addedToIC2PowerGrid) removeFromIC2Grid()
   }
 
   override def onChunkUnload() {
     super.onChunkUnload()
-    if (useIndustrialCraft2Power && addedToIC2PowerGrid) removeFromIC2Grid()
+    if (useIndustrialCraft2Power() && addedToIC2PowerGrid) removeFromIC2Grid()
   }
 
   private def removeFromIC2Grid() {
@@ -88,7 +88,7 @@ trait IndustrialCraft2Experimental extends Common with IndustrialCraft2Common wi
 
   @Optional.Method(modid = Mods.IDs.IndustrialCraft2)
   def getDemandedEnergy: Double = {
-    if (!useIndustrialCraft2Power) 0.0
+    if (!useIndustrialCraft2Power()) 0.0
     else if (conversionBuffer < energyThroughput * Settings.get.tickFrequency)
       math.min(EnumFacing.VALUES.map(globalDemand).max, Power.toEU(energyThroughput))
     else 0
