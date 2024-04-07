@@ -17,4 +17,4 @@
 
 ## List of contributors
 
-asie, Computerdores, Glease, Hawk777, repo-alt, RobertCochran yut23
+asie, Computerdores, Glease, Hawk777, repo-alt, RobertCochran, yut23
