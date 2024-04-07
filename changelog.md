@@ -1,5 +1,6 @@
 ## Fixes/improvements
 
+* (1.7.10) [#3524] Add support for reading Thaumcraft aspect information from Wands. (repo-alt)
 * (1.12.2) [#3659] Fixed bug when programatically transferring fluids from specific tanks. (yut23)
 * [#3664] Fixed client-side errors when using third-party mod energy integration on an integrated server.
 * [#3677] Fixed crash when showing error containing a percent sign with the Analyzer item.
@@ -9,4 +10,4 @@
 
 ## List of contributors
 
-asie, Computerdores, Glease, Hawk777, yut23
+asie, Computerdores, Glease, Hawk777, repo-alt, yut23
