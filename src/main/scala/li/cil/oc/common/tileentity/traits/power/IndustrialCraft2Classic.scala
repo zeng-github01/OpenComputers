@@ -18,13 +18,13 @@ import net.minecraftforge.common.util.ForgeDirection
 trait IndustrialCraft2Classic extends Common with IndustrialCraft2Common {
   private var conversionBuffer = 0.0
 
-  private lazy val useIndustrialCraft2ClassicPower = isServer && Mods.IndustrialCraft2Classic.isAvailable
+  private def useIndustrialCraft2ClassicPower() = isServer && Mods.IndustrialCraft2Classic.isAvailable
 
   // ----------------------------------------------------------------------- //
 
   override def updateEntity() {
     super.updateEntity()
-    if (useIndustrialCraft2ClassicPower && world.getTotalWorldTime % Settings.get.tickFrequency == 0) {
+    if (useIndustrialCraft2ClassicPower() && world.getTotalWorldTime % Settings.get.tickFrequency == 0) {
       updateEnergy()
     }
   }
@@ -40,17 +40,17 @@ trait IndustrialCraft2Classic extends Common with IndustrialCraft2Common {
 
   override def validate() {
     super.validate()
-    if (useIndustrialCraft2ClassicPower && !addedToIC2PowerGrid) EventHandler.scheduleIC2Add(this)
+    if (useIndustrialCraft2ClassicPower() && !addedToIC2PowerGrid) EventHandler.scheduleIC2Add(this)
   }
 
   override def invalidate() {
     super.invalidate()
-    if (useIndustrialCraft2ClassicPower && addedToIC2PowerGrid) removeFromIC2Grid()
+    if (useIndustrialCraft2ClassicPower() && addedToIC2PowerGrid) removeFromIC2Grid()
   }
 
   override def onChunkUnload() {
     super.onChunkUnload()
-    if (useIndustrialCraft2ClassicPower && addedToIC2PowerGrid) removeFromIC2Grid()
+    if (useIndustrialCraft2ClassicPower() && addedToIC2PowerGrid) removeFromIC2Grid()
   }
 
   private def removeFromIC2Grid() {
@@ -91,7 +91,7 @@ trait IndustrialCraft2Classic extends Common with IndustrialCraft2Common {
 
   @Optional.Method(modid = Mods.IDs.IndustrialCraft2Classic)
   def demandsEnergy: Int = {
-    if (!useIndustrialCraft2ClassicPower) 0
+    if (!useIndustrialCraft2ClassicPower()) 0
     else if (conversionBuffer < energyThroughput * Settings.get.tickFrequency)
       math.min(ForgeDirection.VALID_DIRECTIONS.map(globalDemand).max, Power.toEU(energyThroughput)).toInt
     else 0

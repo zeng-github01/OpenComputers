@@ -23,7 +23,7 @@ import scala.collection.convert.WrapAsJava._
 
 @Injectable.Interface(value = "appeng.api.networking.IGridHost", modid = Mods.IDs.AppliedEnergistics2)
 trait AppliedEnergistics2 extends Common {
-  private lazy val useAppliedEnergistics2Power = isServer && Mods.AppliedEnergistics2.isAvailable
+  private def useAppliedEnergistics2Power() = isServer && Mods.AppliedEnergistics2.isAvailable
 
   // 'Manual' lazy val, because lazy vals mess up the class loader, leading to class not found exceptions.
   private var node: Option[AnyRef] = None
@@ -52,24 +52,24 @@ trait AppliedEnergistics2 extends Common {
 
   override def validate() {
     super.validate()
-    if (useAppliedEnergistics2Power) EventHandler.scheduleAE2Add(this)
+    if (useAppliedEnergistics2Power()) EventHandler.scheduleAE2Add(this)
   }
 
   override def invalidate() {
     super.invalidate()
-    if (useAppliedEnergistics2Power) securityBreak()
+    if (useAppliedEnergistics2Power()) securityBreak()
   }
 
   override def onChunkUnload() {
     super.onChunkUnload()
-    if (useAppliedEnergistics2Power) securityBreak()
+    if (useAppliedEnergistics2Power()) securityBreak()
   }
 
   // ----------------------------------------------------------------------- //
 
   override def readFromNBTForServer(nbt: NBTTagCompound) {
     super.readFromNBTForServer(nbt)
-    if (useAppliedEnergistics2Power) loadNode(nbt)
+    if (useAppliedEnergistics2Power()) loadNode(nbt)
   }
 
   @Optional.Method(modid = Mods.IDs.AppliedEnergistics2)
@@ -79,7 +79,7 @@ trait AppliedEnergistics2 extends Common {
 
   override def writeToNBTForServer(nbt: NBTTagCompound) {
     super.writeToNBTForServer(nbt)
-    if (useAppliedEnergistics2Power) saveNode(nbt)
+    if (useAppliedEnergistics2Power()) saveNode(nbt)
   }
 
   @Optional.Method(modid = Mods.IDs.AppliedEnergistics2)

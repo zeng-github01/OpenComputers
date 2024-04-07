@@ -13,7 +13,7 @@ import net.minecraft.nbt.NBTTagCompound
 
 @Injectable.Interface(value = "factorization.api.IChargeConductor", modid = Mods.IDs.Factorization)
 trait Factorization extends Common {
-  private lazy val useFactorizationPower = isServer && Mods.Factorization.isAvailable
+  private def useFactorizationPower() = isServer && Mods.Factorization.isAvailable
 
   @Optional.Method(modid = Mods.IDs.Factorization)
   private lazy val charge: AnyRef = this match {
@@ -26,7 +26,7 @@ trait Factorization extends Common {
   // ----------------------------------------------------------------------- //
 
   override def updateEntity() {
-    if (useFactorizationPower) updateEnergy()
+    if (useFactorizationPower()) updateEnergy()
     super.updateEntity()
   }
 
@@ -39,7 +39,7 @@ trait Factorization extends Common {
   }
 
   override def invalidate() {
-    if (useFactorizationPower) invalidateCharge()
+    if (useFactorizationPower()) invalidateCharge()
     super.invalidate()
   }
 
@@ -49,7 +49,7 @@ trait Factorization extends Common {
   }
 
   override def onChunkUnload() {
-    if (useFactorizationPower) removeCharge()
+    if (useFactorizationPower()) removeCharge()
     super.onChunkUnload()
   }
 
@@ -62,7 +62,7 @@ trait Factorization extends Common {
 
   override def readFromNBTForServer(nbt: NBTTagCompound) {
     super.readFromNBTForServer(nbt)
-    if (useFactorizationPower) loadCharge(nbt)
+    if (useFactorizationPower()) loadCharge(nbt)
   }
 
   @Optional.Method(modid = Mods.IDs.Factorization)
@@ -72,7 +72,7 @@ trait Factorization extends Common {
 
   override def writeToNBTForServer(nbt: NBTTagCompound) {
     super.writeToNBTForServer(nbt)
-    if (useFactorizationPower) saveCharge(nbt)
+    if (useFactorizationPower()) saveCharge(nbt)
   }
 
   @Optional.Method(modid = Mods.IDs.Factorization)

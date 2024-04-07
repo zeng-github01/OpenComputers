@@ -10,7 +10,7 @@ import net.minecraftforge.common.util.ForgeDirection
 
 @Injectable.Interface(value = "Reika.RotaryCraft.API.Power.ShaftPowerReceiver", modid = Mods.IDs.RotaryCraft)
 trait RotaryCraft extends Common {
-  private lazy val useRotaryCraftPower = isServer && Mods.RotaryCraft.isAvailable
+  private def useRotaryCraftPower() = isServer && Mods.RotaryCraft.isAvailable
 
   private var omega = 0
   private var torque = 0
@@ -20,7 +20,7 @@ trait RotaryCraft extends Common {
   // ----------------------------------------------------------------------- //
 
   override def updateEntity() {
-    if (useRotaryCraftPower) updateEnergy()
+    if (useRotaryCraftPower()) updateEnergy()
     super.updateEntity()
   }
 
