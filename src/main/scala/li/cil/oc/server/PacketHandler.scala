@@ -1,6 +1,7 @@
 package li.cil.oc.server
 
 import li.cil.oc.Localization
+import li.cil.oc.OpenComputers
 import li.cil.oc.api
 import li.cil.oc.api.internal.Server
 import li.cil.oc.api.machine.Machine
@@ -8,6 +9,7 @@ import li.cil.oc.api.network.Connector
 import li.cil.oc.common.Achievement
 import li.cil.oc.common.PacketType
 import li.cil.oc.common.component.TextBuffer
+import li.cil.oc.common.container
 import li.cil.oc.common.entity.Drone
 import li.cil.oc.common.item.{Delegator, Tablet, TabletWrapper}
 import li.cil.oc.common.item.data.DriveData
@@ -23,8 +25,14 @@ import net.minecraft.util.EnumHand
 import net.minecraftforge.common.DimensionManager
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent
+import org.apache.logging.log4j.MarkerManager
 
 object PacketHandler extends CommonPacketHandler {
+  private val securityMarker = MarkerManager.getMarker("SuspiciousPackets")
+
+  private def logForgedPacket(player: EntityPlayerMP) =
+    OpenComputers.log.warn(securityMarker, "Player {} tried to send GUI packets without opening them", player.getGameProfile)
+
   @SubscribeEvent
   def onPacket(e: ServerCustomPacketEvent): Unit =
     onPacketData(e.getManager.getNetHandler, e.getPacket.payload, e.getHandler.asInstanceOf[NetHandlerPlayServer].player)
@@ -61,10 +69,14 @@ object PacketHandler extends CommonPacketHandler {
   def onComputerPower(p: PacketParser): Unit = {
     val entity = p.readTileEntity[Computer]()
     val setPower = p.readBoolean()
-    entity match {
-      case Some(t) => p.player match {
-        case player: EntityPlayerMP => trySetComputerPower(t.machine, setPower, player)
-        case _ =>
+    p.player match {
+      case player: EntityPlayerMP => player.openContainer match {
+        case container: container.Player => (container.otherInventory, entity) match {
+          case (computer: Computer, Some(c2)) if c2.position == computer.position =>
+            trySetComputerPower(computer.machine, setPower, player)
+          case _ => logForgedPacket(player)
+        }
+        case _ => logForgedPacket(player)
       }
       case _ => // Invalid packet.
     }
@@ -73,17 +85,23 @@ object PacketHandler extends CommonPacketHandler {
   def onServerPower(p: PacketParser): Unit = {
     val entity = p.readTileEntity[Rack]()
     val index = p.readInt()
-    val setPower = p.readBoolean()
-    entity match {
-      case Some(t) => {
-        val mountableIndex = index
-        t.getMountable(mountableIndex) match {
-          case server: Server => p.player match {
-            case player: EntityPlayerMP => trySetComputerPower(server.machine, setPower, player)
-            case _ => // Invalid packet.
-          }
-          case _ => // Invalid packet.
+    val readServer = entity match {
+      case Some(t) =>
+        t.getMountable(index) match {
+          case server: Server => server
+          case _ => return  // probably just lag, not invalid packet
         }
+      case _ => return
+    }
+    val setPower = p.readBoolean()
+    p.player match {
+      case player: EntityPlayerMP => player.openContainer match {
+        case container: container.Server => container.server match {
+          case Some(server) if server == readServer =>
+            trySetComputerPower(server.machine, setPower, player)
+          case _ => logForgedPacket(player)
+        }
+        case _ => logForgedPacket(player)
       }
       case _ => // Invalid packet.
     }
@@ -125,16 +143,17 @@ object PacketHandler extends CommonPacketHandler {
   def onDronePower(p: PacketParser): Unit = {
     val entity = p.readEntity[Drone]()
     val power = p.readBoolean()
-    entity match {
-      case Some(drone) => p.player match {
-        case player: EntityPlayerMP =>
+    p.player match {
+      case player: EntityPlayerMP => (player.openContainer, entity) match {
+        case (c: container.Drone, Some(readDrone)) if c.drone == readDrone =>
+          val drone = c.drone
           if (power) {
             drone.preparePowerUp()
           }
           trySetComputerPower(drone.machine, power, player)
-        case _ =>
+        case _ => logForgedPacket(player)
       }
-      case _ => // Invalid packet.
+      case _ =>
     }
   }
 
@@ -245,13 +264,14 @@ object PacketHandler extends CommonPacketHandler {
     val mountableIndex = p.readInt()
     val nodeIndex = p.readInt()
     val side = p.readDirection()
-    entity match {
-      case Some(t) => p.player match {
-        case player: EntityPlayerMP if t.isUsableByPlayer(player) =>
-          t.connect(mountableIndex, nodeIndex - 1, side)
-        case _ =>
+    p.player match {
+      case player: EntityPlayerMP => (player.openContainer, entity) match {
+        case (container: container.Rack, Some(readRack)) if readRack == container.rack  =>
+          if (container.rack.isUsableByPlayer(player))
+            container.rack.connect(mountableIndex, nodeIndex - 1, side)
+        case _ => logForgedPacket(player)
       }
-      case _ => // Invalid packet.
+      case _ =>
     }
   }
 

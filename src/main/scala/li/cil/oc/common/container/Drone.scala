@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 
-class Drone(playerInventory: InventoryPlayer, drone: entity.Drone) extends Player(playerInventory, drone.mainInventory) {
+class Drone(playerInventory: InventoryPlayer, val drone: entity.Drone) extends Player(playerInventory, drone.mainInventory) {
   val deltaY = 0
 
   for (i <- 0 to 1) {
