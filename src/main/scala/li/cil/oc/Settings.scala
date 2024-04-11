@@ -124,6 +124,7 @@ class Settings(val config: Config) {
   val robotActionXp = config.getDouble("robot.xp.actionXp") max 0
   val robotExhaustionXpRate = config.getDouble("robot.xp.exhaustionXpRate") max 0
   val robotOreXpRate = config.getDouble("robot.xp.oreXpRate") max 0
+  val robotSuckXpRate = config.getDouble("robot.xp.suckXpRate") max 0
   val bufferPerLevel = config.getDouble("robot.xp.bufferPerLevel") max 0
   val toolEfficiencyPerLevel = config.getDouble("robot.xp.toolEfficiencyPerLevel") max 0
   val harvestSpeedBoostPerLevel = config.getDouble("robot.xp.harvestSpeedBoostPerLevel") max 0
@@ -387,6 +388,7 @@ class Settings(val config: Config) {
   val serverRackSwitchTier = (config.getInt("misc.serverRackSwitchTier") - 1) max Tier.None min Tier.Three
   val redstoneDelay = config.getDouble("misc.redstoneDelay") max 0
   val tradingRange = config.getDouble("misc.tradingRange") max 0
+  val suckExperienceRange = config.getDouble("misc.suckExperienceRange") max 0
   val mfuRange = config.getInt("misc.mfuRange") max 0 min 128
 
   // ----------------------------------------------------------------------- //

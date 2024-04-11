@@ -1,7 +1,6 @@
 package li.cil.oc.server.component
 
 import java.util
-
 import li.cil.oc.Constants
 import li.cil.oc.api.driver.DeviceInfo.DeviceAttribute
 import li.cil.oc.api.driver.DeviceInfo.DeviceClass
@@ -20,6 +19,7 @@ import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.item.EntityXPOrb
 import net.minecraft.init.Items
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.math.{AxisAlignedBB, BlockPos}
 
 import scala.collection.convert.WrapAsJava._
 import scala.collection.convert.WrapAsScala._
@@ -108,6 +108,30 @@ class UpgradeExperience(val host: EnvironmentHost with internal.Agent) extends A
     }
     addExperience(xp * Settings.get.constantXpGrowth)
     result(true)
+  }
+
+  @Callback(doc = """function():number -- suck experience from nearby. return the amount of sucked experience""")
+  def suck(context: Context, args: Arguments): Array[AnyRef] = {
+    val blockPos = host.player().getPosition
+    val maxRange = Settings.get.suckExperienceRange
+    var gained = 0D
+
+    val alignedBB = new AxisAlignedBB(blockPos, new BlockPos(blockPos.getX + maxRange, blockPos.getY + maxRange, blockPos.getZ + maxRange))
+    val orbs = host.world().getEntitiesWithinAABB(classOf[EntityXPOrb], alignedBB)
+
+    orbs.foreach( orb =>
+      if (!orb.isDead && orb.xpValue > 0) {
+        val copy = experience.toDouble
+        addExperience(orb.xpValue * Settings.get.robotSuckXpRate)
+        val added = (experience.toDouble - copy) / Settings.get.robotSuckXpRate
+        gained += added
+        orb.xpValue = (orb.xpValue - added.toInt)
+        if(orb.xpValue <= 0){
+          orb.setDead()
+        }
+      }
+    )
+    result(gained)
   }
 
   private def updateClient() = host match {
