@@ -388,7 +388,7 @@ class Settings(val config: Config) {
   val serverRackSwitchTier = (config.getInt("misc.serverRackSwitchTier") - 1) max Tier.None min Tier.Three
   val redstoneDelay = config.getDouble("misc.redstoneDelay") max 0
   val tradingRange = config.getDouble("misc.tradingRange") max 0
-  val suckExperienceRange = config.getDouble("misc.suckExperienceRange") max 0
+  val suckXpRange = config.getDouble("misc.suckXpRange") max 0
   val mfuRange = config.getInt("misc.mfuRange") max 0 min 128
 
   // ----------------------------------------------------------------------- //
