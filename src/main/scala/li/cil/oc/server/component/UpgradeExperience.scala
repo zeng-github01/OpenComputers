@@ -113,10 +113,9 @@ class UpgradeExperience(val host: EnvironmentHost with internal.Agent) extends A
   @Callback(doc = """function():number -- suck experience from nearby. return the amount of sucked experience""")
   def suck(context: Context, args: Arguments): Array[AnyRef] = {
     val blockPos = host.player().getPosition
-    val maxRange = Settings.get.suckXpRange
     var gained = 0D
 
-    val alignedBB = new AxisAlignedBB(blockPos, new BlockPos(blockPos.getX + maxRange, blockPos.getY + maxRange, blockPos.getZ + maxRange))
+    val alignedBB = new AxisAlignedBB(blockPos, new BlockPos(blockPos.getX + Settings.get.suckXpRange, blockPos.getY + Settings.get.suckXpRange, blockPos.getZ + Settings.get.suckXpRange))
     val orbs = host.world().getEntitiesWithinAABB(classOf[EntityXPOrb], alignedBB)
 
     orbs.foreach( orb =>
