@@ -11,6 +11,7 @@
 * [#3664] Fixed client-side errors when using third-party mod energy integration on an integrated server.
 * [#3677] Fixed crash when showing error containing a percent sign with the Analyzer item.
 * [#3698] Fixed documentation for the Screen's "turnOn" and "turnOff" functions. (Hawk777, DCNick3)
+* [#3663] Fixed response code/message information not being preserved for unsuccessful HTTP responses.
 * [#3691] Improved documentation for software bundled with the "network" floppy. (Computerdores)
 * [#3644] Improved forged packet protection with regards to configuring server racks. (Glease)
 * Updated GNU Unifont to 15.1.05.
