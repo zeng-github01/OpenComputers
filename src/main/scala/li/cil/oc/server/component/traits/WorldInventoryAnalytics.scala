@@ -41,7 +41,7 @@ trait WorldInventoryAnalytics extends WorldAware with SideRestricted with Networ
     withInventory(facing, inventory => {
       val stackA = inventory.getStackInSlot(args.checkSlot(inventory, 1))
       val stackB = inventory.getStackInSlot(args.checkSlot(inventory, 2))
-      result(stackA == stackB || InventoryUtils.haveSameItemType(stackA, stackB, args.optBoolean(3, false)))
+      result(stackA == stackB || InventoryUtils.haveSameItemType(stackA, stackB, args.optBoolean(3, false), checkDamage = true))
     })
   }
 
@@ -55,7 +55,7 @@ trait WorldInventoryAnalytics extends WorldAware with SideRestricted with Networ
       DatabaseAccess.withDatabase(node, dbAddress, database => {
         val dbSlot = args.checkSlot(database.data, 3)
         val dbStack = database.getStackInSlot(dbSlot)
-        result(InventoryUtils.haveSameItemType(stack, dbStack, args.optBoolean(4, false)))
+        result(InventoryUtils.haveSameItemType(stack, dbStack, args.optBoolean(4, false), checkDamage = true))
       })
     })
   }
@@ -83,18 +83,19 @@ trait WorldInventoryAnalytics extends WorldAware with SideRestricted with Networ
   def getAllStacks(context: Context, args: Arguments): Array[AnyRef] = if (Settings.get.allowItemStackInspection) {
     val facing = checkSideForAction(args, 0)
     withInventory(facing, inventory => {
-        val stacks = new Array[ItemStack](inventory.getSizeInventory)
-        for(i <- 0 until inventory.getSizeInventory){
-          stacks(i) = inventory.getStackInSlot(i)
-        }
-        result(new ItemStackArrayValue(stacks))
-      })
+      val stacks = new Array[ItemStack](inventory.getSizeInventory)
+      for (i <- 0 until inventory.getSizeInventory) {
+        stacks(i) = inventory.getStackInSlot(i)
+      }
+      result(new ItemStackArrayValue(stacks))
+    })
   }
   else result(Unit, "not enabled in config")
 
   @Callback(doc = """function(side:number):string -- Get the the name of the inventory on the specified side of the device.""")
   def getInventoryName(context: Context, args: Arguments): Array[AnyRef] = if (Settings.get.allowItemStackInspection) {
     val facing = checkSideForAction(args, 0)
+
     def blockAt(position: BlockPosition): Option[Block] = position.world match {
       case Some(world) if world.blockExists(position) => world.getBlock(position) match {
         case block: Block => Some(block)
@@ -102,6 +103,7 @@ trait WorldInventoryAnalytics extends WorldAware with SideRestricted with Networ
       }
       case _ => None
     }
+
     withInventorySource(facing, {
       case BlockInventorySource(position, _) => blockAt(position) match {
         case Some(block) => result(block.getUnlocalizedName)
@@ -117,12 +119,14 @@ trait WorldInventoryAnalytics extends WorldAware with SideRestricted with Networ
   def store(context: Context, args: Arguments): Array[AnyRef] = {
     val facing = checkSideForAction(args, 0)
     val dbAddress = args.checkString(2)
+
     def store(stack: ItemStack) = DatabaseAccess.withDatabase(node, dbAddress, database => {
       val dbSlot = args.checkSlot(database.data, 3)
       val nonEmpty = database.getStackInSlot(dbSlot) != null
       database.setStackInSlot(dbSlot, stack.copy())
       result(nonEmpty)
     })
+
     withInventory(facing, inventory => store(inventory.getStackInSlot(args.checkSlot(inventory, 1))))
   }
 

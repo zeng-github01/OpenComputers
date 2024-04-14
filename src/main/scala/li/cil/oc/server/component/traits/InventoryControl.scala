@@ -42,7 +42,7 @@ trait InventoryControl extends InventoryAware {
   def compareTo(context: Context, args: Arguments): Array[AnyRef] = {
     val slot = args.checkSlot(inventory, 0)
     result((stackInSlot(selectedSlot), stackInSlot(slot)) match {
-      case (Some(stackA), Some(stackB)) => InventoryUtils.haveSameItemType(stackA, stackB, args.optBoolean(1, false))
+      case (Some(stackA), Some(stackB)) => InventoryUtils.haveSameItemType(stackA, stackB, args.optBoolean(1, false), checkDamage = true)
       case (None, None) => true
       case _ => false
     })
@@ -57,7 +57,7 @@ trait InventoryControl extends InventoryAware {
     }
     else result((stackInSlot(selectedSlot), stackInSlot(slot)) match {
       case (Some(from), Some(to)) =>
-        if (InventoryUtils.haveSameItemType(from, to, checkNBT = true)) {
+        if (InventoryUtils.haveSameItemType(from, to, checkNBT = true, checkDamage = true)) {
           val space = math.min(inventory.getInventoryStackLimit, to.getMaxStackSize) - to.stackSize
           val amount = math.min(count, math.min(space, from.stackSize))
           if (amount > 0) {
