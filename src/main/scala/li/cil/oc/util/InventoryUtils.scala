@@ -20,10 +20,10 @@ object InventoryUtils {
    * <br>
    * Optionally check for equality in NBT data.
    */
-  def haveSameItemType(stackA: ItemStack, stackB: ItemStack, checkNBT: Boolean = false) =
+  def haveSameItemType(stackA: ItemStack, stackB: ItemStack, checkNBT: Boolean = false, checkDamage: Boolean = false) =
     stackA != null && stackB != null &&
       stackA.getItem == stackB.getItem &&
-      (!stackA.getHasSubtypes || stackA.getItemDamage == stackB.getItemDamage) &&
+      (!checkDamage || stackA.getItemDamage == stackB.getItemDamage) &&
       (!checkNBT || ItemStack.areItemStackTagsEqual(stackA, stackB))
 
   /**
@@ -247,16 +247,16 @@ object InventoryUtils {
   }
 
   /**
-    * Extracts an item stack from an inventory.
-    * <br>
-    * This will try to remove items of the same type as the specified item stack
-    * up to the number of the stack's size for all slots in the specified inventory.
-    * If exact is true, the items colated will also match meta data
-    * <br>
-    * This uses the <tt>extractFromInventorySlot</tt> method, and therefore
-    * handles special cases such as sided inventories and stack size limits.
-    */
-  def extractFromInventory(stack: ItemStack, inventory: IInventory, side: ForgeDirection, simulate: Boolean = false, exact: Boolean = true) : ItemStack = {
+   * Extracts an item stack from an inventory.
+   * <br>
+   * This will try to remove items of the same type as the specified item stack
+   * up to the number of the stack's size for all slots in the specified inventory.
+   * If exact is true, the items colated will also match meta data
+   * <br>
+   * This uses the <tt>extractFromInventorySlot</tt> method, and therefore
+   * handles special cases such as sided inventories and stack size limits.
+   */
+  def extractFromInventory(stack: ItemStack, inventory: IInventory, side: ForgeDirection, simulate: Boolean = false, exact: Boolean = true): ItemStack = {
     val range = inventory match {
       case sided: ISidedInventory => sided.getAccessibleSlotsFromSide(side.ordinal).toIterable
       case _ => 0 until inventory.getSizeInventory
@@ -264,7 +264,7 @@ object InventoryUtils {
     val remaining = stack.copy()
     for (slot <- range if remaining.stackSize > 0) {
       extractFromInventorySlot(stackInInv => {
-        if (stackInInv != null && remaining.getItem == stackInInv.getItem && (!exact || haveSameItemType(remaining, stackInInv, checkNBT = true))) {
+        if (stackInInv != null && remaining.getItem == stackInInv.getItem && (!exact || haveSameItemType(remaining, stackInInv, checkNBT = true, checkDamage = true))) {
           val transferred = stackInInv.stackSize min remaining.stackSize
           remaining.stackSize -= transferred
           if (!simulate) {
@@ -425,5 +425,7 @@ object InventoryUtils {
 sealed trait InventorySource {
   def inventory: IInventory
 }
+
 final case class BlockInventorySource(position: BlockPosition, inventory: IInventory) extends InventorySource
+
 final case class EntityInventorySource(entity: Entity, inventory: IInventory) extends InventorySource

@@ -49,7 +49,7 @@ trait InventoryAnalytics extends InventoryAware with NetworkAware {
     DatabaseAccess.withDatabase(node, dbAddress, database => {
       val dbSlot = args.checkSlot(database.data, 2)
       val dbStack = database.getStackInSlot(dbSlot)
-      result(InventoryUtils.haveSameItemType(localStack, dbStack, args.optBoolean(3, false)))
+      result(InventoryUtils.haveSameItemType(localStack, dbStack, args.optBoolean(3, false), checkDamage = true))
     })
   }
 }
