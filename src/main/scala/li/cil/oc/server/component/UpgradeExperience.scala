@@ -1,24 +1,5 @@
 package li.cil.oc.server.component
 
-import cofh.core.util.ArrayHashList
-import com.google.common.collect.{ForwardingList, ImmutableList}
-import com.sun.corba.se.spi.ior.{IOR, IORTemplate, IORTemplateList, TaggedProfileTemplate}
-import com.sun.javafx.collections.SortableList
-import com.sun.org.apache.xerces.internal.xs.datatypes.{ByteList, ObjectList}
-import com.sun.org.apache.xerces.internal.xs.{LSInputList, ShortList, StringList, XSNamespaceItemList, XSObjectList}
-import com.typesafe.config.ConfigList
-import gnu.trove.decorator.{TByteListDecorator, TCharListDecorator, TDoubleListDecorator, TFloatListDecorator, TIntListDecorator, TLongListDecorator, TShortListDecorator}
-import it.unimi.dsi.fastutil.booleans.BooleanList
-import it.unimi.dsi.fastutil.bytes.ByteList
-import it.unimi.dsi.fastutil.chars.CharList
-import it.unimi.dsi.fastutil.doubles.DoubleList
-import it.unimi.dsi.fastutil.floats.FloatList
-import it.unimi.dsi.fastutil.ints.IntList
-import it.unimi.dsi.fastutil.longs.LongList
-import it.unimi.dsi.fastutil.objects.{ObjectList, ReferenceList}
-import it.unimi.dsi.fastutil.shorts.ShortList
-import javafx.collections.ObservableList
-
 import java.util
 import li.cil.oc.Constants
 import li.cil.oc.api.driver.DeviceInfo.DeviceAttribute
@@ -34,15 +15,11 @@ import li.cil.oc.api.machine.Context
 import li.cil.oc.api.network.Visibility
 import li.cil.oc.api.prefab.AbstractManagedEnvironment
 import li.cil.oc.util.{BlockPosition, UpgradeExperience}
-import mcp.mobius.waila.api.ITaggedList
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.item.EntityXPOrb
 import net.minecraft.init.Items
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.math.{AxisAlignedBB, BlockPos}
-import sun.awt.util.{IdentityArrayList, IdentityLinkedList}
 
-import java.util.concurrent.CopyOnWriteArrayList
 import scala.collection.convert.WrapAsJava._
 import scala.collection.convert.WrapAsScala._
 
