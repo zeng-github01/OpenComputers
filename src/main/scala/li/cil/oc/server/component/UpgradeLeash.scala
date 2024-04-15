@@ -85,7 +85,7 @@ class UpgradeLeash(val host: Entity with internal.Drone) extends AbstractManaged
 
   private def unleashAll() {
     entitiesInBounds(classOf[EntityLiving], position.bounds.grow(5, 5, 5)).foreach(entity => {
-      if (leashedEntities.contains(entity.getUniqueID) && entity.getLeashHolder == host.player()) {
+      if (leashedEntities.contains(entity.getUniqueID) && entity.getLeashHolder == host) {
         entity.clearLeashed(true, false)
         breakable {
           for (index <- 0 to host.mainInventory().getSizeInventory) {
