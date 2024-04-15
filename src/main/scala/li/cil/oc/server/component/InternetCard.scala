@@ -1,36 +1,22 @@
 package li.cil.oc.server.component
 
 import com.google.common.net.InetAddresses
+import li.cil.oc.{Constants, OpenComputers, Settings}
+import li.cil.oc.api.driver.DeviceInfo
+import li.cil.oc.api.driver.DeviceInfo.{DeviceAttribute, DeviceClass}
+import li.cil.oc.api.machine.{Arguments, Callback, Context}
+import li.cil.oc.api.network._
+import li.cil.oc.api.{Network, prefab}
+import li.cil.oc.api.prefab.AbstractValue
+import li.cil.oc.util.ThreadPoolFactory
 
-import java.io.BufferedWriter
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStreamWriter
+import java.io._
 import java.net._
 import java.nio.ByteBuffer
-import java.nio.channels.SelectionKey
-import java.nio.channels.Selector
-import java.nio.channels.SocketChannel
+import java.nio.channels.{SelectionKey, Selector, SocketChannel}
 import java.util
 import java.util.UUID
 import java.util.concurrent._
-import li.cil.oc.Constants
-import li.cil.oc.OpenComputers
-import li.cil.oc.Settings
-import li.cil.oc.api.Network
-import li.cil.oc.api.driver.DeviceInfo
-import li.cil.oc.api.driver.DeviceInfo.DeviceAttribute
-import li.cil.oc.api.driver.DeviceInfo.DeviceClass
-import li.cil.oc.api.machine.Arguments
-import li.cil.oc.api.machine.Callback
-import li.cil.oc.api.machine.Context
-import li.cil.oc.api.network._
-import li.cil.oc.api.prefab
-import li.cil.oc.api.prefab.AbstractValue
-import li.cil.oc.util.ThreadPoolFactory
-import net.minecraft.server.MinecraftServer
-
 import scala.collection.convert.WrapAsJava._
 import scala.collection.convert.WrapAsScala._
 import scala.collection.mutable
@@ -530,9 +516,13 @@ object InternetCard {
 
             // Calling getInputStream() can cause an exception to be thrown for unsuccessful HTTP responses,
             // so call it only after the response code/message are set to allow retrieving them.
-            // TODO: This should allow accessing getErrorStream() for reading unsuccessful HTTP responses' output,
+            // This should allow accessing getErrorStream() for reading unsuccessful HTTP responses' output,
             // but this would be a breaking change for existing OC code.
-            http.getInputStream
+            try {
+              http.getInputStream
+            } catch {
+              case e : IOException => http.getErrorStream
+            }
           }
           catch {
             case t: Throwable =>
