@@ -1,25 +1,17 @@
 package li.cil.oc.server.component
 
-import java.util
-import java.util.UUID
-
-import li.cil.oc.Constants
-import li.cil.oc.api.driver.DeviceInfo.DeviceAttribute
-import li.cil.oc.api.driver.DeviceInfo.DeviceClass
-import li.cil.oc.Settings
-import li.cil.oc.api.Network
 import li.cil.oc.api.driver.DeviceInfo
-import li.cil.oc.api.machine.Arguments
-import li.cil.oc.api.machine.Callback
-import li.cil.oc.api.machine.Context
-import li.cil.oc.api.network.EnvironmentHost
-import li.cil.oc.api.network.Visibility
-import li.cil.oc.api.prefab
+import li.cil.oc.api.driver.DeviceInfo.{DeviceAttribute, DeviceClass}
+import li.cil.oc.api.machine.{Arguments, Callback, Context}
+import li.cil.oc.api.network.{EnvironmentHost, Visibility}
+import li.cil.oc.api.{Network, prefab}
 import li.cil.oc.util.BlockPosition
-import net.minecraft.entity.Entity
-import net.minecraft.entity.IMerchant
+import li.cil.oc.{Constants, Settings}
+import net.minecraft.entity.{Entity, IMerchant}
 import net.minecraft.util.Vec3
 
+import java.util
+import java.util.UUID
 import scala.collection.convert.WrapAsJava._
 import scala.collection.convert.WrapAsScala._
 import scala.collection.mutable

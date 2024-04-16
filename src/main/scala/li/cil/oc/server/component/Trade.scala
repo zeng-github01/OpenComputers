@@ -1,23 +1,19 @@
 package li.cil.oc.server.component
 
-import java.util.UUID
-
 import li.cil.oc.Settings
 import li.cil.oc.api.machine._
 import li.cil.oc.api.network.EnvironmentHost
 import li.cil.oc.api.prefab.AbstractValue
 import li.cil.oc.common.EventHandler
 import li.cil.oc.util.InventoryUtils
-import net.minecraft.entity.Entity
-import net.minecraft.entity.IMerchant
-import net.minecraft.inventory.IInventory
-import net.minecraft.item.ItemStack
+import net.minecraft.entity.{Entity, IMerchant}
+import net.minecraft.inventory.{IInventory, InventoryMerchant, SlotMerchantResult}
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.village.MerchantRecipe
 import net.minecraftforge.common.DimensionManager
-import net.minecraftforge.common.util.ForgeDirection
 
+import java.util.UUID
 import scala.collection.convert.WrapAsScala._
 import scala.ref.WeakReference
 
@@ -104,26 +100,28 @@ class Trade(val info: TradeInfo) extends AbstractValue {
     // Now we'll check if we have enough items to perform the trade, caching first
     info.merchant.get match {
       case Some(merchant) => {
-        val firstInputStack = recipe.getItemToBuy
-        val secondInputStack = if (recipe.hasSecondItemToBuy) Option(recipe.getSecondItemToBuy) else None
+        val slotMerchantResult = new SlotMerchantResult(info.player.get,merchant,info.inventoryMerchant.get, 2,0,0)
+//        val firstInputStack = recipe.getItemToBuy
+//        val secondInputStack = if (recipe.hasSecondItemToBuy) Option(recipe.getSecondItemToBuy) else None
 
-        def containsAccumulativeItemStack(stack: ItemStack) =
-          InventoryUtils.extractFromInventory(stack, inventory, ForgeDirection.UNKNOWN, simulate = true, exact = exact).stackSize == 0
-
-        // Check if we have enough to perform the trade.
-        if (!containsAccumulativeItemStack(firstInputStack) || !secondInputStack.forall(containsAccumulativeItemStack))
-          return false
+//        def containsAccumulativeItemStack(stack: ItemStack) =
+//          InventoryUtils.extractFromInventory(stack, inventory, ForgeDirection.UNKNOWN, simulate = true, exact = exact).stackSize == 0
+//
+//        // Check if we have enough to perform the trade.
+//        if (!containsAccumulativeItemStack(firstInputStack) || !secondInputStack.forall(containsAccumulativeItemStack))
+//          return false
 
         // Now we need to check if we have enough inventory space to accept the item we get for the trade.
         val outputStack = recipe.getItemToSell.copy()
+        slotMerchantResult.onPickupFromSlot(info.player.get,outputStack)
 
         // We established that out inventory allows to perform the trade, now actually do the trade.
-        InventoryUtils.extractFromInventory(firstInputStack, inventory, ForgeDirection.UNKNOWN, exact = exact)
-        secondInputStack.map(InventoryUtils.extractFromInventory(_, inventory, ForgeDirection.UNKNOWN, exact = exact))
-        InventoryUtils.insertIntoInventory(outputStack, inventory, None, outputStack.stackSize)
+//        InventoryUtils.extractFromInventory(firstInputStack, inventory, ForgeDirection.UNKNOWN, exact = exact)
+//        secondInputStack.map(InventoryUtils.extractFromInventory(_, inventory, ForgeDirection.UNKNOWN, exact = exact))
+//        InventoryUtils.insertIntoInventory(outputStack, inventory, None, outputStack.stackSize)
 
         // Tell the merchant we used the recipe, so MC can disable it and/or enable more recipes.
-        merchant.useRecipe(recipe)
+//        merchant.useRecipe(recipe)
         true
       }
       case _ => false
@@ -142,6 +140,13 @@ class TradeInfo(var host: Option[EnvironmentHost], var merchant: WeakReference[I
   def inventory = host match {
     case Some(agent: li.cil.oc.api.internal.Agent) => Option(agent.mainInventory())
     case _ => None
+  }
+  def player = host match {
+    case Some(agent: li.cil.oc.api.internal.Agent) => Option(agent.player())
+  }
+
+  def inventoryMerchant = host match {
+    case Some(agent: li.cil.oc.api.internal.Agent) => Option(new InventoryMerchant(agent.player(),merchant.get.orNull))
   }
 
   def load(nbt: NBTTagCompound): Unit = {
