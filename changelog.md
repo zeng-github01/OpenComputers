@@ -9,8 +9,9 @@
 
 ## OpenOS fixes/improvements
 
+* [#3714] Fix an OpenOS 1.8.0 regression causing event.pullFiltered() to effectively ignore filter timeouts.
 * [#3727] Fix an exception handler bug in process.lua, uncovered by fixing recursive xpcall() handling in 1.8.4.
 
 ## List of contributors
 
-asie, charagarland, HfSr, Timothé GRISOT
+asie, charagarland, DragDen, HfSr, Timothé GRISOT
