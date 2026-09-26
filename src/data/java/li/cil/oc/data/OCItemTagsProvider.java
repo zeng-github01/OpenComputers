@@ -1,10 +1,13 @@
 package li.cil.oc.data;
 
 import li.cil.oc.OpenComputers;
+import li.cil.oc.common.init.OCItems;
 import li.cil.oc.common.recipe.ExtendedRecipe;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.Tags;
@@ -33,5 +36,8 @@ class OCItemTagsProvider extends ItemTagsProvider {
             Items.GOLD_BLOCK,
             Items.IRON_BLOCK
         );
+
+        tag(ItemTags.create(ResourceLocation.withDefaultNamespace("bookshelf_books")))
+            .add(OCItems.Manual().get());
     }
 }
