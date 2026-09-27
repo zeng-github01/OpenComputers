@@ -1,0 +1,7 @@
+{
+  "selector": "opencomputers:audio_cable",
+  "priority": 1001,
+  "properties": {
+    "sable:mass": 0.01
+  }
+}
