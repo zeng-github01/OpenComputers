@@ -194,7 +194,7 @@ final class MultipartCablePart(
     val gray = Color.rgbValues(DyeColor.LIGHT_GRAY)
     val baseState = OCBlocks.Cable.get.defaultBlockState()
     val nextState = Direction.values.foldLeft(baseState) { (next, side) =>
-      val neighborPos = pos.offset(side.getStepX, side.getStepY, side.getStepZ)
+      val neighborPos = new BlockPos(pos.getX + side.getStepX, pos.getY + side.getStepY, pos.getZ + side.getStepZ)
       val neighborSide = side.getOpposite
       val multipartCable = MultipartColorLookup.cablePart(level, neighborPos)
       val canPassMultipart = MultipartColorLookup.canConnectFromSide(level, pos, side) &&

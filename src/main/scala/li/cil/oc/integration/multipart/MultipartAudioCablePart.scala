@@ -61,7 +61,7 @@ final class MultipartAudioCablePart(initialState: BlockState = OCBlocks.AudioCab
 
   private def updateConnections(): Unit = if (hasLevel) {
     val nextState = Direction.values.foldLeft(OCBlocks.AudioCable.get.defaultBlockState()) { (current, side) =>
-      val neighborPos = pos.offset(side.getStepX, side.getStepY, side.getStepZ)
+      val neighborPos = new BlockPos(pos.getX + side.getStepX, pos.getY + side.getStepY, pos.getZ + side.getStepZ)
       val neighbor = level.getBlockEntity(neighborPos)
       val canPassMultipart = MultipartColorLookup.canAudioConnectFromSide(level, pos, side) &&
         MultipartColorLookup.canAudioConnectFromSide(level, neighborPos, side.getOpposite)
