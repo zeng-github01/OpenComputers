@@ -1,7 +1,6 @@
 package li.cil.oc.server.component
 
 import java.util
-
 import li.cil.oc.Constants
 import li.cil.oc.api.driver.DeviceInfo.DeviceAttribute
 import li.cil.oc.api.driver.DeviceInfo.DeviceClass
@@ -15,7 +14,7 @@ import li.cil.oc.api.machine.Callback
 import li.cil.oc.api.machine.Context
 import li.cil.oc.api.network.Visibility
 import li.cil.oc.api.prefab.AbstractManagedEnvironment
-import li.cil.oc.util.UpgradeExperience
+import li.cil.oc.util.{BlockPosition, UpgradeExperience}
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.item.EntityXPOrb
 import net.minecraft.init.Items
@@ -24,7 +23,7 @@ import net.minecraft.nbt.NBTTagCompound
 import scala.collection.convert.WrapAsJava._
 import scala.collection.convert.WrapAsScala._
 
-class UpgradeExperience(val host: EnvironmentHost with internal.Agent) extends AbstractManagedEnvironment with DeviceInfo {
+class UpgradeExperience(val host: EnvironmentHost with internal.Agent) extends AbstractManagedEnvironment with traits.WorldAware with DeviceInfo {
   final val MaxLevel = 30
 
   override val node = api.Network.newNode(this, Visibility.Network).
@@ -41,6 +40,8 @@ class UpgradeExperience(val host: EnvironmentHost with internal.Agent) extends A
   )
 
   override def getDeviceInfo: util.Map[String, String] = deviceInfo
+
+  override def position: BlockPosition = BlockPosition(host)
 
   var experience = 0.0
 
@@ -108,6 +109,28 @@ class UpgradeExperience(val host: EnvironmentHost with internal.Agent) extends A
     }
     addExperience(xp * Settings.get.constantXpGrowth)
     result(true)
+  }
+
+  @Callback(doc = """function():number -- suck experience from nearby. return the amount of sucked experience""")
+  def suck(context: Context, args: Arguments): Array[AnyRef] = {
+    val nearBounds = position.bounds
+    val farBounds = nearBounds.offset(Settings.get.suckXpRange, Settings.get.suckXpRange, Settings.get.suckXpRange)
+    val bounds = nearBounds.union(farBounds)
+    var gained = 0D
+    entitiesInBounds[EntityXPOrb](classOf[EntityXPOrb], bounds).foreach(orb => {
+
+      if (!orb.isDead && orb.xpValue > 0) {
+        val copy = experience.toDouble
+        addExperience(orb.xpValue * Settings.get.robotSuckXpRate)
+        val added = (experience.toDouble - copy) / Settings.get.robotSuckXpRate
+        gained += added
+        orb.xpValue = (orb.xpValue - added.toInt)
+        if (orb.xpValue <= 0) {
+          orb.setDead()
+        }
+      }
+    })
+    result(gained)
   }
 
   private def updateClient() = host match {
