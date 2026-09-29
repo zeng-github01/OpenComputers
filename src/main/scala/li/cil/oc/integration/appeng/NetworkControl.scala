@@ -496,32 +496,33 @@ object NetworkControl {
       this.reason = s"request failed ($reason)"
     }
 
-    def asCraft(f: (ICraftingLink) => Array[AnyRef]): Array[AnyRef] = {
+    def asCraft(f: ICraftingLink => Array[AnyRef], onFail: Boolean = false): Array[AnyRef] = {
       if (isComputing) result(Unit, "computing")
       else link match {
         case Some(craft: ICraftingLink) if !failed => f(craft)
-        case _ => result(false, reason)
+        case _ => result(onFail, reason)
       }
     }
 
-    @Callback(doc = """function():boolean -- Get whether the crafting request has been canceled.""")
+    @Callback(doc = """function():boolean[, string] -- Get whether the crafting request has been canceled or failed.""")
     def isCanceled(context: Context, args: Arguments): Array[AnyRef] = {
-      asCraft(craft => result(craft.isCanceled))
+      asCraft(craft => result(craft.isCanceled), onFail = true)
     }
 
-    @Callback(doc = """function():boolean -- Get whether the crafting request is done.""")
+    @Callback(doc = """function():boolean[, string] -- Get whether the crafting request is done.""")
     def isDone(context: Context, args: Arguments): Array[AnyRef] = {
       asCraft(craft => result(craft.isDone))
     }
 
-    @Callback(doc = """function():boolean -- Cancels the request. Returns false if the craft cannot be canceled or nil if the link is computing""")
+    @Callback(doc = """function():boolean[, string] -- Cancels the request. Returns false if the craft cannot be canceled or nil if the link is computing.""")
     def cancel(context: Context, args: Arguments): Array[AnyRef] = {
       asCraft(craft => {
         if (craft.isDone) {
-          return result(false, "job already completed")
+          result(false, "job already completed")
+        } else {
+          craft.cancel()
+          result(true)
         }
-        craft.cancel()
-        result(true)
       })
     }
 
