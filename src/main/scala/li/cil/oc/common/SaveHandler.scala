@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import li.cil.oc.OpenComputers
 import li.cil.oc.Settings
+import li.cil.oc.api.detail.SaveHandlerAPI
 import li.cil.oc.api.machine.MachineHost
 import li.cil.oc.api.network.EnvironmentHost
 import li.cil.oc.util.BlockPosition
@@ -18,7 +19,7 @@ import li.cil.oc.util.SafeThreadPool
 import li.cil.oc.util.ThreadPoolFactory
 import net.minecraft.nbt.CompressedStreamTools
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.math.ChunkPos
+import net.minecraft.util.math.{BlockPos, ChunkPos}
 import net.minecraft.world.{World, WorldServer}
 import net.minecraftforge.common.DimensionManager
 import net.minecraftforge.event.world.WorldEvent
@@ -32,7 +33,7 @@ import scala.collection.mutable
 // Used by the native lua state to store kernel and stack data in auxiliary
 // files instead of directly in the tile entity data, avoiding potential
 // problems with the tile entity data becoming too large.
-object SaveHandler {
+object SaveHandler extends SaveHandlerAPI{
   private val uuidRegex = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
 
   private val TimeToHoldOntoOldSaves = 60 * 1000
@@ -245,6 +246,12 @@ object SaveHandler {
     stateSaveHandler.withPool(_.submit(new Runnable {
       override def run(): Unit = cleanSaveData()
     }))
+  }
+
+
+  override def scheduleSave(world: World, pos: BlockPos, nbt: NBTTagCompound, name: String, data: Array[Byte]): Unit = {
+    val position = BlockPosition(pos, world)
+    scheduleSave(position, nbt, name, data)
   }
 }
 

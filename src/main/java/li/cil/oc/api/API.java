@@ -8,6 +8,7 @@ import li.cil.oc.api.detail.MachineAPI;
 import li.cil.oc.api.detail.ManualAPI;
 import li.cil.oc.api.detail.NanomachinesAPI;
 import li.cil.oc.api.detail.NetworkAPI;
+import li.cil.oc.api.detail.SaveHandlerAPI;
 
 /**
  * Central reference for the API.
@@ -45,6 +46,7 @@ public class API {
     public static ManualAPI manual = null;
     public static NanomachinesAPI nanomachines = null;
     public static NetworkAPI network = null;
+    public static SaveHandlerAPI saveHandler = null;
 
     // ----------------------------------------------------------------------- //
 

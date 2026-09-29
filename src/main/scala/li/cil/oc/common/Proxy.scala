@@ -72,6 +72,7 @@ class Proxy {
     api.API.machine = machine.Machine
     api.API.nanomachines = nanomachines.Nanomachines
     api.API.network = network.Network
+    api.API.saveHandler = SaveHandler
 
     api.API.config = Settings.get.config
 
